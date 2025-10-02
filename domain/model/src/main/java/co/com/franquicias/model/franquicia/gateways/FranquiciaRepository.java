@@ -11,4 +11,5 @@ public interface FranquiciaRepository {
     Flux<Franquicia> findByAllFranquicias();
     Mono<Franquicia> updateFranquicia(Integer id, String nombreFranquicia);
     Mono<Void> deleteFranquicia(Integer idFranquicia);
+    Flux<Franquicia> findProductoWithMaxStockBySucursal(Integer idFranquicia);
 }
