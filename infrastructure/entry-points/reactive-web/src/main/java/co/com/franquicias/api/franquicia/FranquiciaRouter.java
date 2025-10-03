@@ -1,6 +1,7 @@
 package co.com.franquicias.api.franquicia;
 
 import co.com.franquicias.api.franquicia.dto.request.RegisterFranquiciaDto;
+import co.com.franquicias.api.franquicia.dto.request.UpdateNombreFranquiciaRequestDto;
 import co.com.franquicias.api.franquicia.dto.response.FranquiciaResponseDto;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -15,14 +16,13 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.reactive.function.server.RouterFunction;
 import org.springframework.web.reactive.function.server.ServerResponse;
 
-import static org.springframework.web.reactive.function.server.RequestPredicates.GET;
-import static org.springframework.web.reactive.function.server.RequestPredicates.POST;
+import static org.springframework.web.reactive.function.server.RequestPredicates.*;
 import static org.springframework.web.reactive.function.server.RouterFunctions.route;
 
 @Configuration
 public class FranquiciaRouter {
     @Bean
-    @RouterOperations(
+    @RouterOperations({
             @RouterOperation(
                     path = "/franquicia/register",
                     method = RequestMethod.POST,
@@ -60,10 +60,49 @@ public class FranquiciaRouter {
                                     )
                             }
                     )
+            ),
+            @RouterOperation(
+                    path = "/franquicia/update",
+                    method = RequestMethod.PATCH,
+                    beanClass = FranquiciaHandler.class,
+                    beanMethod = "updateFranquicia",
+                    operation = @Operation(
+                            operationId = "updateFranquicia",
+                            summary = "Actualizar el nombre de una Franquicia",
+                            description = "Endpoint para actualizar el nombre de una franquicia con ID",
+                            tags = {"Franquicias"},
+                            requestBody = @RequestBody(
+                                    description = "Datos de la franquicia a actualizar",
+                                    required = true,
+                                    content = @Content(
+                                            mediaType = "application/json",
+                                            schema = @Schema(implementation = UpdateNombreFranquiciaRequestDto.class)
+                                    )
+                            ),
+                            responses = {
+                                    @ApiResponse(
+                                            responseCode = "200",
+                                            description = "Franquicia actualizada correctamente",
+                                            content = @Content(
+                                                    mediaType = "application/json",
+                                                    schema = @Schema(implementation = FranquiciaResponseDto.class)
+                                            )
+                                    ),
+                                    @ApiResponse(
+                                            responseCode = "400",
+                                            description = "Datos de entrada inválidos"
+                                    ),
+                                    @ApiResponse(
+                                            responseCode = "500",
+                                            description = "Error interno del servidor"
+                                    )
+                            }
+                    )
             )
-    )
+    })
     public RouterFunction<ServerResponse> routeFranquicia (FranquiciaHandler franquiciaHandler){
         return route(POST("/franquicia/register"), franquiciaHandler::registerFranquicia)
+                .andRoute(PATCH("/franquicia/update"), franquiciaHandler::updateFranquicia)
 
                 ;
     }
