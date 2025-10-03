@@ -2,9 +2,13 @@ package co.com.franquicias.usecase.franquicia;
 
 import co.com.franquicias.model.franquicia.Franquicia;
 import co.com.franquicias.model.franquicia.gateways.FranquiciaRepository;
+import co.com.franquicias.model.producto.Producto;
 import lombok.RequiredArgsConstructor;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+
+import java.util.Comparator;
+import java.util.List;
 
 @RequiredArgsConstructor
 public class FranquiciaUseCase implements IFranquiciaUseCase{
@@ -43,5 +47,23 @@ public class FranquiciaUseCase implements IFranquiciaUseCase{
         return franquiciaRepository.findByIdFranquicia(idFranquicia)
                 .switchIfEmpty(Mono.error(new IllegalArgumentException("No existe una franquicia con el id: " + idFranquicia)))
                 .flatMap(franquicia -> franquiciaRepository.deleteFranquicia(idFranquicia));
+    }
+
+    @Override
+    public Flux<Franquicia> findProductoWithMaxStockBySucursal(Integer idFranquicia) {
+        return franquiciaRepository.findByIdFranquicia(idFranquicia)
+                .filter(franquicia -> franquicia.getListaSucursales() != null)
+                .map(franquicia -> {
+                    franquicia.getListaSucursales().forEach(sucursal -> {
+                        if (sucursal.getListaProductos() != null && !sucursal.getListaProductos().isEmpty()) {
+                            Producto maxProducto = sucursal.getListaProductos().stream()
+                                    .max(Comparator.comparingInt(Producto::getStock))
+                                    .orElse(null);
+                            sucursal.setListaProductos(maxProducto != null ? List.of(maxProducto) : List.of());
+                        }
+                    });
+                    return franquicia;
+                })
+                .flux();
     }
 }
