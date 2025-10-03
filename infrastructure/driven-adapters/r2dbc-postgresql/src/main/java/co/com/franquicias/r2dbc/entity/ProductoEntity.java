@@ -1,7 +1,7 @@
 package co.com.franquicias.r2dbc.entity;
 
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.relational.core.mapping.Table;
 import lombok.Data;
 
 @Table(name = "producto")
