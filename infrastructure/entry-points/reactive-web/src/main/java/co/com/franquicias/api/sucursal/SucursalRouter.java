@@ -1,8 +1,5 @@
 package co.com.franquicias.api.sucursal;
 
-import co.com.franquicias.api.franquicia.FranquiciaHandler;
-import co.com.franquicias.api.franquicia.dto.request.RegisterFranquiciaDto;
-import co.com.franquicias.api.franquicia.dto.response.FranquiciaResponseDto;
 import co.com.franquicias.api.sucursal.dto.request.RegisterSucursalRequestDto;
 import co.com.franquicias.api.sucursal.dto.response.SucursalResponseDto;
 import io.swagger.v3.oas.annotations.Operation;
