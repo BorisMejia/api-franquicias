@@ -12,3 +12,20 @@ spring:
       path: /h2
   profiles:
     include:
+adapters:
+  r2dbc:
+    host: "localhost"
+    port: 5432
+    database: "franquicia_db"
+    schema: "public"
+    username: "franquicia_user"
+    password: "franquicia_pass"
+  data:
+    r2dbc:
+      repositories: null
+      enabled: true
+spring-doc:
+  api-docs:
+    path: /v3/api-docs
+  swagger-ui:
+    path: /swagger

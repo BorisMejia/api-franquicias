@@ -1,0 +1,23 @@
+version: '3.8'
+services:
+  postgres:
+    image: postgres:15
+    container_name: franquicia-db
+    environment:
+      POSTGRES_DB: franquicia_db
+      POSTGRES_USER: franquicia_user
+      POSTGRES_PASSWORD: franquicia_pass
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+#      - ./init-db.sql:/docker-entrypoint-initdb.d/init-db.sql
+    networks:
+      - franquicia-network
+
+volumes:
+  pgdata:
+
+networks:
+  franquicia-network:
+    driver: bridge
