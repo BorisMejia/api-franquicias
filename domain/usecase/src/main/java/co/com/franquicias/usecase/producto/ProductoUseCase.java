@@ -3,7 +3,6 @@ package co.com.franquicias.usecase.producto;
 import co.com.franquicias.model.franquicia.gateways.FranquiciaRepository;
 import co.com.franquicias.model.producto.Producto;
 import co.com.franquicias.model.producto.gateways.ProductoRepository;
-import co.com.franquicias.model.sucursal.gateways.SucursalRepository;
 import lombok.RequiredArgsConstructor;
 import reactor.core.publisher.Mono;
 

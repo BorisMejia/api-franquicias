@@ -10,4 +10,5 @@ public interface IFranquiciaUseCase {
     Mono<Franquicia> findByIdFranquicia(Integer idFranquicia);
     Mono<Franquicia> updateNombreFranquicia(Integer idFranquicia, String nuevoNombreFranquicia);
     Mono<Void> deleteFranquicia(Integer idFranquicia);
+    Flux<Franquicia> findProductoWithMaxStockBySucursal(Integer idFranquicia);
 }
