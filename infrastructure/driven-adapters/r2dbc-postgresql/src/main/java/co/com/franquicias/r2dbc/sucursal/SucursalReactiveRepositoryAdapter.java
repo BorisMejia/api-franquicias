@@ -26,11 +26,20 @@ public class SucursalReactiveRepositoryAdapter extends ReactiveAdapterOperations
 
     @Override
     public Mono<Sucursal> saveSucursal(Integer idFranquicia, Integer idSucursal, String nombreSucursal) {
-        return null;
+        SucursalEntity entity = new SucursalEntity();
+        entity.setIdSucursal(idSucursal);
+        entity.setNombreSucursal(nombreSucursal);
+        return repository.save(entity)
+                .map(saved -> mapper.map(saved, Sucursal.class));
     }
 
     @Override
     public Mono<Sucursal> updateSucursal(Integer idFranquicia, Integer idSucursal, String nuevoNombre) {
-        return null;
+        return repository.findById(idSucursal)
+                .flatMap(entity -> {
+                    entity.setNombreSucursal(nuevoNombre);
+                    return repository.save(entity);
+                })
+                .map(updated -> mapper.map(updated, Sucursal.class));
     }
 }
