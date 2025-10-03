@@ -25,16 +25,23 @@ public class FranquiciaUseCase implements IFranquiciaUseCase{
 
     @Override
     public Mono<Franquicia> findByIdFranquicia(Integer idFranquicia) {
-        return null;
+        return franquiciaRepository.findByIdFranquicia(idFranquicia);
     }
 
     @Override
     public Mono<Franquicia> updateNombreFranquicia(Integer idFranquicia, String nuevoNombreFranquicia) {
-        return null;
+        return franquiciaRepository.findByIdFranquicia(idFranquicia)
+                .map(updateFranquicia -> {
+                    updateFranquicia.setNombreFranquicia(nuevoNombreFranquicia);
+                    return updateFranquicia;
+                })
+                .flatMap(franquiciaRepository::saveFranquicia);
     }
 
     @Override
     public Mono<Void> deleteFranquicia(Integer idFranquicia) {
-        return null;
+        return franquiciaRepository.findByIdFranquicia(idFranquicia)
+                .switchIfEmpty(Mono.error(new IllegalArgumentException("No existe una franquicia con el id: " + idFranquicia)))
+                .flatMap(franquicia -> franquiciaRepository.deleteFranquicia(idFranquicia));
     }
 }
