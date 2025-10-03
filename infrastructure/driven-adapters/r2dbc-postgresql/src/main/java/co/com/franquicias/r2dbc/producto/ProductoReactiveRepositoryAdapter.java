@@ -2,7 +2,9 @@ package co.com.franquicias.r2dbc.producto;
 
 import co.com.franquicias.model.producto.Producto;
 import co.com.franquicias.model.producto.gateways.ProductoRepository;
+import co.com.franquicias.model.sucursal.Sucursal;
 import co.com.franquicias.r2dbc.entity.ProductoEntity;
+import co.com.franquicias.r2dbc.entity.SucursalEntity;
 import co.com.franquicias.r2dbc.helper.ReactiveAdapterOperations;
 import org.reactivecommons.utils.ObjectMapper;
 import org.springframework.stereotype.Repository;
@@ -26,21 +28,36 @@ public class ProductoReactiveRepositoryAdapter extends ReactiveAdapterOperations
 
     @Override
     public Mono<Producto> saveProducto(Integer idFranquicia, Integer idSucursal, Integer idProducto, String nombreProducto, Integer stock) {
-        return null;
+        ProductoEntity entity = new ProductoEntity();
+        entity.setIdProducto(idProducto);
+        entity.setNombreProducto(nombreProducto);
+        entity.setStock(stock);
+        return repository.save(entity)
+                .map(saved -> mapper.map(saved, Producto.class));
     }
 
     @Override
     public Mono<Producto> updateNombreProducto(Integer idFranquicia, Integer idSucursal, Integer idProducto, String nuevoNombreProducto) {
-        return null;
+        return repository.findById(idProducto)
+                .flatMap(entity -> {
+                    entity.setNombreProducto(nuevoNombreProducto);
+                    return repository.save(entity);
+                })
+                .map(updated -> mapper.map(updated, Producto.class));
     }
 
     @Override
     public Mono<Producto> updateStockProducto(Integer idFranquicia, Integer idSucursal, Integer idProducto, Integer stock) {
-        return null;
+        return repository.findById(idProducto)
+                .flatMap(entity -> {
+                    entity.setStock(stock);
+                    return repository.save(entity);
+                })
+                .map(updated -> mapper.map(updated, Producto.class));
     }
 
     @Override
     public Mono<Void> deleteProducto(Integer idFranquicia, Integer idSucursal, Integer idProducto) {
-        return null;
+        return repository.deleteById(idProducto);
     }
 }
