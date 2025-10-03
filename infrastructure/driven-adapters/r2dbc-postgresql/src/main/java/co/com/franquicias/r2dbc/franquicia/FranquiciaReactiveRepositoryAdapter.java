@@ -3,7 +3,12 @@ package co.com.franquicias.r2dbc.franquicia;
 import co.com.franquicias.model.franquicia.Franquicia;
 import co.com.franquicias.model.franquicia.gateways.FranquiciaRepository;
 import co.com.franquicias.r2dbc.entity.FranquiciaEntity;
+import co.com.franquicias.r2dbc.entity.ProductoEntity;
 import co.com.franquicias.r2dbc.helper.ReactiveAdapterOperations;
+
+import java.util.Comparator;
+import java.util.List;
+
 import org.reactivecommons.utils.ObjectMapper;
 import org.springframework.stereotype.Repository;
 import reactor.core.publisher.Flux;
@@ -27,27 +32,36 @@ public class FranquiciaReactiveRepositoryAdapter extends ReactiveAdapterOperatio
 
     @Override
     public Mono<Franquicia> saveFranquicia(Franquicia franquicia) {
-        return null;
+        FranquiciaEntity entity = mapper.map(franquicia, FranquiciaEntity.class);
+        return repository.save(entity)
+                .map(saved -> mapper.map(saved, Franquicia.class));
     }
 
     @Override
     public Mono<Franquicia> findByIdFranquicia(Integer idFranquicia) {
-        return null;
+        return repository.findById(idFranquicia)
+                .map(entity -> mapper.map(entity, Franquicia.class));
     }
 
     @Override
     public Flux<Franquicia> findByAllFranquicias() {
-        return null;
+        return repository.findAll()
+                .map(entity -> mapper.map(entity, Franquicia.class));
     }
 
     @Override
     public Mono<Franquicia> updateFranquicia(Integer id, String nombreFranquicia) {
-        return null;
+        return repository.findById(id)
+                .flatMap(entity -> {
+                    entity.setNombreFranquicia(nombreFranquicia);
+                    return repository.save(entity);
+                })
+                .map(updated -> mapper.map(updated, Franquicia.class));
     }
 
     @Override
     public Mono<Void> deleteFranquicia(Integer idFranquicia) {
-        return null;
+        return repository.deleteById(idFranquicia);
     }
 
     @Override
