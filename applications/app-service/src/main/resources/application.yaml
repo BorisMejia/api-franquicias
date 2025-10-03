@@ -1,17 +1,16 @@
-##Spring Configuration
 server:
   port: 8080
 spring:
   application:
-    name: api-franquicias
+    name: "api-franquicias"
   devtools:
     add-properties: false
   h2:
     console:
       enabled: true
-      path: /h2
+      path: "/h2"
   profiles:
-    include:
+    include: null
 adapters:
   r2dbc:
     host: "localhost"
@@ -26,6 +25,17 @@ adapters:
       enabled: true
 spring-doc:
   api-docs:
-    path: /v3/api-docs
+    path: "/v3/api-docs"
   swagger-ui:
-    path: /swagger
+    path: "/swagger"
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "health,prometheus"
+  endpoint:
+    health:
+      probes:
+        enabled: true
+cors:
+  allowed-origins: "http://localhost:4200,http://localhost:8080"
