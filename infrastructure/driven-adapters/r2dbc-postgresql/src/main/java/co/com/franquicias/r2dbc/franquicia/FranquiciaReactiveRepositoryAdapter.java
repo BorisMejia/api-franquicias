@@ -2,8 +2,8 @@ package co.com.franquicias.r2dbc.franquicia;
 
 import co.com.franquicias.model.franquicia.Franquicia;
 import co.com.franquicias.model.franquicia.gateways.FranquiciaRepository;
+import co.com.franquicias.model.producto.Producto;
 import co.com.franquicias.r2dbc.entity.FranquiciaEntity;
-import co.com.franquicias.r2dbc.entity.ProductoEntity;
 import co.com.franquicias.r2dbc.helper.ReactiveAdapterOperations;
 
 import java.util.Comparator;
@@ -66,6 +66,25 @@ public class FranquiciaReactiveRepositoryAdapter extends ReactiveAdapterOperatio
 
     @Override
     public Flux<Franquicia> findProductoWithMaxStockBySucursal(Integer idFranquicia) {
-        return null;
+        return repository.findById(idFranquicia)
+            .map(entity -> {
+                if (entity.getListaSucursales() != null) {
+                    entity.getListaSucursales().forEach(sucursal -> {
+                        if (sucursal.getListaProductos() != null && !sucursal.getListaProductos().isEmpty()) {
+                            Producto maxStockProducto = sucursal.getListaProductos().stream()
+                                    .max(Comparator.comparingInt(Producto::getStock))
+                                .orElse(null);
+                            List<Producto> productosMax = maxStockProducto != null
+                                ? List.of(mapper.map(maxStockProducto, Producto.class))
+                                : List.of();
+                            sucursal.setListaProductos(productosMax);
+                        } else {
+                            sucursal.setListaProductos(List.of());
+                        }
+                    });
+                }
+                return mapper.map(entity, Franquicia.class);
+            })
+            .flux();
     }
 }
