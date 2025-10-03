@@ -16,10 +16,12 @@ public class FranquiciaUseCase implements IFranquiciaUseCase{
     private final FranquiciaRepository franquiciaRepository;
     @Override
     public Mono<Franquicia> createFranquicia(Integer idFranquicia, String nombreFranquicia) {
+        if (idFranquicia == null) {
+            return franquiciaRepository.saveFranquicia(new Franquicia(null, nombreFranquicia));
+        }
         return franquiciaRepository.findByIdFranquicia(idFranquicia)
                 .flatMap(exists -> Mono.<Franquicia>error(new IllegalArgumentException("Ya existe una franquicia con este id: " + idFranquicia)))
-                .switchIfEmpty(franquiciaRepository.saveFranquicia(new Franquicia(idFranquicia, nombreFranquicia)))
-                ;
+                .switchIfEmpty(franquiciaRepository.saveFranquicia(new Franquicia(idFranquicia, nombreFranquicia)));
     }
 
     @Override
