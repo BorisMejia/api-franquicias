@@ -1,4 +1,4 @@
-package co.com.franquicias.api;
+package co.com.franquicias.api.franquicia;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

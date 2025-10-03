@@ -1,4 +1,4 @@
-package co.com.franquicias.api;
+package co.com.franquicias.api.franquicia;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;

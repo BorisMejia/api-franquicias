@@ -1,7 +1,7 @@
 package co.com.franquicias.api.config;
 
-import co.com.franquicias.api.FranquiciaHandler;
-import co.com.franquicias.api.FranquiciaRouter;
+import co.com.franquicias.api.franquicia.FranquiciaHandler;
+import co.com.franquicias.api.franquicia.FranquiciaRouter;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.reactive.WebFluxTest;
