@@ -17,4 +17,7 @@ public class Franquicia {
     private Integer idFranquicia;
     private String nombreFranquicia;
     private List<Sucursal> listaSucursales;
+
+    public Franquicia(Integer idFranquicia, String nombreFranquicia) {
+    }
 }

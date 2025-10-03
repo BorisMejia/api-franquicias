@@ -5,7 +5,6 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 //import lombok.NoArgsConstructor;
 import lombok.Setter;
-
 import java.util.List;
 
 @Getter
@@ -17,4 +16,6 @@ public class Sucursal {
     private Integer idSucursal;
     private String nombreSucursal;
     private List<Producto> listaProductos;
+
+    public Sucursal(Integer idSucursal, String nombreSucursal) {}
 }
