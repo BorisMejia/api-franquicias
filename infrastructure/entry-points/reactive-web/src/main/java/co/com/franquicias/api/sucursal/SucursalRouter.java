@@ -44,7 +44,7 @@ public class SucursalRouter {
                             responses = {
                                     @ApiResponse(
                                             responseCode = "200",
-                                            description = "Franquicia registrada exitosamente",
+                                            description = "Sucursal agregada correctamente",
                                             content = @Content(
                                                     mediaType = "application/json",
                                                     schema = @Schema(implementation = SucursalResponseDto.class)
