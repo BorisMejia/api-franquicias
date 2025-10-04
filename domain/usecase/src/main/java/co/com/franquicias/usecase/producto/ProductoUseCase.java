@@ -3,6 +3,7 @@ package co.com.franquicias.usecase.producto;
 import co.com.franquicias.model.franquicia.gateways.FranquiciaRepository;
 import co.com.franquicias.model.producto.Producto;
 import co.com.franquicias.model.producto.gateways.ProductoRepository;
+import co.com.franquicias.model.sucursal.gateways.SucursalRepository;
 import lombok.RequiredArgsConstructor;
 import reactor.core.publisher.Mono;
 
@@ -11,17 +12,15 @@ public class ProductoUseCase implements IProductoUseCase {
 
     private final FranquiciaRepository franquiciaRepository;
     private final ProductoRepository productoRepository;
+    private final SucursalRepository sucursalRepository;
     @Override
     public Mono<Producto> createProducto(Integer idFranquicia, Integer idSucursal, Integer idProducto, String nombreProducto, Integer stock) {
         return franquiciaRepository.findByIdFranquicia(idFranquicia)
                 .switchIfEmpty(Mono.error(new IllegalArgumentException("No existe una franquicia con el id: " + idFranquicia)))
-                .flatMap(franquicia -> {
-                    boolean sucursalExists = franquicia.getListaSucursales().stream()
-                            .anyMatch(sucursal -> sucursal.getIdSucursal().equals(idSucursal));
-                    if (!sucursalExists)
-                        return Mono.error(new IllegalArgumentException("No existe una sucursal con el id: " + idSucursal + " en la franquicia: " + idFranquicia));
-                    return productoRepository.saveProducto(idFranquicia, idSucursal, idProducto, nombreProducto, stock);
-                });
+                .flatMap(sucursal -> sucursalRepository.findByIdSucursal(idSucursal))
+                .switchIfEmpty(Mono.error(new IllegalArgumentException("No existe una sucursal con el id: " + idSucursal)))
+                .flatMap(producto -> productoRepository.saveProducto(idSucursal, idProducto, nombreProducto, stock))
+                ;
     }
 
     @Override
@@ -34,7 +33,7 @@ public class ProductoUseCase implements IProductoUseCase {
                     
                     if (!sucursalExists)
                         return Mono.error(new IllegalArgumentException("No existe una sucursal con el id: " + idSucursal + " en la franquicia: " + idFranquicia));
-                    return productoRepository.deleteProducto(idFranquicia, idSucursal, idProducto);
+                    return productoRepository.deleteProducto(idProducto);
                 });
     }
 
@@ -50,7 +49,7 @@ public class ProductoUseCase implements IProductoUseCase {
                         return Mono.error(new IllegalArgumentException("No existe una sucursal con el id: " + idSucursal + " en la franquicia: " + idFranquicia));
                     if (nuevoStock == null || nuevoStock < 0)
                         return Mono.error(new IllegalArgumentException("El stock no puede ser negativo"));
-                    return productoRepository.updateStockProducto(idFranquicia, idSucursal, idProducto, nuevoStock);
+                    return productoRepository.updateStockProducto(idProducto, nuevoStock);
                 });
     }
 
@@ -66,7 +65,7 @@ public class ProductoUseCase implements IProductoUseCase {
                         return Mono.error(new IllegalArgumentException("No existe una sucursal con el id: " + idSucursal + " en la franquicia: " + idFranquicia));
                     if (nuevoNombreProducto == null || nuevoNombreProducto.trim().isEmpty())
                         return Mono.error(new IllegalArgumentException("El nombre del producto no puede estar vacío"));
-                    return productoRepository.updateNombreProducto(idFranquicia, idSucursal, idProducto, nuevoNombreProducto);
+                    return productoRepository.updateNombreProducto(idProducto, nuevoNombreProducto);
                 });
     }
 }
