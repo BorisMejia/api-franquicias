@@ -36,8 +36,9 @@ public class UseCasesConfig {
         @Bean
         public ProductoUseCase productoUseCase(
                 FranquiciaRepository franquiciaRepository,
-                ProductoRepository productoRepository
+                ProductoRepository productoRepository,
+                SucursalRepository sucursalRepository
         ){
-                return new ProductoUseCase(franquiciaRepository, productoRepository);
+                return new ProductoUseCase(franquiciaRepository, productoRepository, sucursalRepository);
         }
 }
