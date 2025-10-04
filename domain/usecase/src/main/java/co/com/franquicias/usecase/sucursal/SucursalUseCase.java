@@ -22,6 +22,14 @@ public class SucursalUseCase implements ISucursalUseCase{
     public Mono<Sucursal> updateNombreSucursal(Integer idFranquicia, Integer idSucursal, String nuevoNombreSucursal) {
         return franquiciaRepository.findByIdFranquicia(idFranquicia)
                 .switchIfEmpty(Mono.error(new IllegalArgumentException("No existe una franquicia con el id: " + idFranquicia)))
-                .flatMap(franquicia -> sucursalRepository.updateSucursal(idFranquicia, idSucursal, nuevoNombreSucursal));
+                .flatMap(franquicia -> sucursalRepository.updateSucursal(idSucursal, nuevoNombreSucursal));
+    }
+
+    @Override
+    public Mono<Sucursal> findByIdSucursal(Integer idFranquicia, Integer IdSucursal) {
+        return franquiciaRepository.findByIdFranquicia(idFranquicia)
+                .switchIfEmpty(Mono.error(new IllegalArgumentException("No existe una franquicia con el id: " + idFranquicia)))
+                .flatMap(sucursal -> sucursalRepository.findByIdSucursal(IdSucursal))
+                ;
     }
 }
