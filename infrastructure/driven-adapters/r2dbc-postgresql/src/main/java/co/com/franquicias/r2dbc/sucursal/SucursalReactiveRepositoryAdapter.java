@@ -8,6 +8,8 @@ import org.reactivecommons.utils.ObjectMapper;
 import org.springframework.stereotype.Repository;
 import reactor.core.publisher.Mono;
 
+import java.util.ArrayList;
+
 @Repository
 public class SucursalReactiveRepositoryAdapter extends ReactiveAdapterOperations<
         Sucursal/* change for domain model */,
@@ -34,12 +36,24 @@ public class SucursalReactiveRepositoryAdapter extends ReactiveAdapterOperations
     }
 
     @Override
-    public Mono<Sucursal> updateSucursal(Integer idFranquicia, Integer idSucursal, String nuevoNombre) {
+    public Mono<Sucursal> updateSucursal(Integer idSucursal, String nuevoNombre) {
         return repository.findById(idSucursal)
                 .flatMap(entity -> {
                     entity.setNombreSucursal(nuevoNombre);
                     return repository.save(entity);
                 })
                 .map(updated -> mapper.map(updated, Sucursal.class));
+    }
+
+    @Override
+    public Mono<Sucursal> findByIdSucursal(Integer idSucursal) {
+        return repository.findById(idSucursal)
+                .switchIfEmpty(Mono.error(new IllegalArgumentException("Sucursal no encontrada con id: " + idSucursal)))
+                .map(entity -> Sucursal.builder()
+                        .idSucursal(entity.getIdSucursal())
+                        .nombreSucursal(entity.getNombreSucursal())
+                        .idFranquicia(entity.getIdFranquicia())
+                        .listaProductos(new ArrayList<>())
+                .build());
     }
 }

@@ -15,6 +15,7 @@ import java.util.List;
 public class Sucursal {
     private Integer idSucursal;
     private String nombreSucursal;
+    private Integer idFranquicia;
     private List<Producto> listaProductos;
 
     public Sucursal(Integer idSucursal, String nombreSucursal) {}
