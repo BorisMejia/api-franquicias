@@ -31,6 +31,7 @@ public class SucursalReactiveRepositoryAdapter extends ReactiveAdapterOperations
         SucursalEntity entity = new SucursalEntity();
         entity.setIdSucursal(idSucursal);
         entity.setNombreSucursal(nombreSucursal);
+        entity.setIdFranquicia(idFranquicia);
         return repository.save(entity)
                 .map(saved -> mapper.map(saved, Sucursal.class));
     }
