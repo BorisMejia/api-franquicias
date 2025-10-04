@@ -2,6 +2,7 @@ package co.com.franquicias.api.producto;
 
 import co.com.franquicias.api.producto.dto.mapper.ProductoMapper;
 import co.com.franquicias.api.producto.dto.request.RegisterProductoRequestDto;
+import co.com.franquicias.api.producto.dto.request.UpdateStockProductoRequestDto;
 import co.com.franquicias.api.sucursal.dto.request.RegisterSucursalRequestDto;
 import co.com.franquicias.usecase.producto.ProductoUseCase;
 import lombok.RequiredArgsConstructor;
@@ -27,6 +28,18 @@ public class ProductoHandler {
                 ))
                 .map(productoMapper::toResponse)
                 .flatMap(responseCreate -> ServerResponse.ok().bodyValue(responseCreate));
+    }
+
+    public Mono<ServerResponse> updateStock(ServerRequest request){
+        return request.bodyToMono(UpdateStockProductoRequestDto.class)
+                .flatMap(updateStock -> productoUseCase.updateStock(
+                        updateStock.idFranquicia(),
+                        updateStock.idSucursal(),
+                        updateStock.idProducto(),
+                        updateStock.nuevoStock()
+                ))
+                .map(productoMapper::toResponseUpdate)
+                .flatMap(responseUpdate -> ServerResponse.ok().bodyValue(responseUpdate));
     }
 
 }
