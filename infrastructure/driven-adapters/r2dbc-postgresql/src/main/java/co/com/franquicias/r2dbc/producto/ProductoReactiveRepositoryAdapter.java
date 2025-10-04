@@ -27,17 +27,16 @@ public class ProductoReactiveRepositoryAdapter extends ReactiveAdapterOperations
     }
 
     @Override
-    public Mono<Producto> saveProducto(Integer idFranquicia, Integer idSucursal, Integer idProducto, String nombreProducto, Integer stock) {
+    public Mono<Producto> saveProducto(Integer IdSucursal, Integer idProducto, String nombreProducto, Integer stock) {
         ProductoEntity entity = new ProductoEntity();
-        entity.setIdProducto(idProducto);
+        entity.setIdSucursal(IdSucursal);
         entity.setNombreProducto(nombreProducto);
         entity.setStock(stock);
         return repository.save(entity)
                 .map(saved -> mapper.map(saved, Producto.class));
     }
-
     @Override
-    public Mono<Producto> updateNombreProducto(Integer idFranquicia, Integer idSucursal, Integer idProducto, String nuevoNombreProducto) {
+    public Mono<Producto> updateNombreProducto(Integer idProducto, String nuevoNombreProducto) {
         return repository.findById(idProducto)
                 .flatMap(entity -> {
                     entity.setNombreProducto(nuevoNombreProducto);
@@ -47,7 +46,7 @@ public class ProductoReactiveRepositoryAdapter extends ReactiveAdapterOperations
     }
 
     @Override
-    public Mono<Producto> updateStockProducto(Integer idFranquicia, Integer idSucursal, Integer idProducto, Integer stock) {
+    public Mono<Producto> updateStockProducto( Integer idProducto, Integer stock) {
         return repository.findById(idProducto)
                 .flatMap(entity -> {
                     entity.setStock(stock);
@@ -57,7 +56,7 @@ public class ProductoReactiveRepositoryAdapter extends ReactiveAdapterOperations
     }
 
     @Override
-    public Mono<Void> deleteProducto(Integer idFranquicia, Integer idSucursal, Integer idProducto) {
+    public Mono<Void> deleteProducto(Integer idProducto) {
         return repository.deleteById(idProducto);
     }
 }
