@@ -41,12 +41,9 @@ public class ProductoUseCase implements IProductoUseCase {
     public Mono<Producto> updateStock(Integer idFranquicia, Integer idSucursal, Integer idProducto, Integer nuevoStock) {
         return franquiciaRepository.findByIdFranquicia(idFranquicia)
                 .switchIfEmpty(Mono.error(new IllegalArgumentException("No existe una franquicia con el id: " + idFranquicia)))
-                .flatMap(franquicia -> {
-                    boolean sucursalExists = franquicia.getListaSucursales().stream()
-                            .anyMatch(sucursal -> sucursal.getIdSucursal().equals(idSucursal));
-
-                    if (!sucursalExists)
-                        return Mono.error(new IllegalArgumentException("No existe una sucursal con el id: " + idSucursal + " en la franquicia: " + idFranquicia));
+                .flatMap(franquicia -> sucursalRepository.findByIdSucursal(idSucursal))
+                .switchIfEmpty(Mono.error(new IllegalArgumentException("No existe una sucursal con el id: " + idSucursal)))
+                .flatMap(sucursal -> {
                     if (nuevoStock == null || nuevoStock < 0)
                         return Mono.error(new IllegalArgumentException("El stock no puede ser negativo"));
                     return productoRepository.updateStockProducto(idProducto, nuevoStock);
