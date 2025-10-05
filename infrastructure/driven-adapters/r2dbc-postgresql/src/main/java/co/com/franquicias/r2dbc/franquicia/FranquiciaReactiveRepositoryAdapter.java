@@ -3,9 +3,14 @@ package co.com.franquicias.r2dbc.franquicia;
 import co.com.franquicias.model.franquicia.Franquicia;
 import co.com.franquicias.model.franquicia.gateways.FranquiciaRepository;
 import co.com.franquicias.model.producto.Producto;
+import co.com.franquicias.model.sucursal.Sucursal;
 import co.com.franquicias.r2dbc.entity.FranquiciaEntity;
+import co.com.franquicias.r2dbc.entity.ProductoEntity;
 import co.com.franquicias.r2dbc.helper.ReactiveAdapterOperations;
+import co.com.franquicias.r2dbc.sucursal.SucursalReactiveRepository;
+import co.com.franquicias.r2dbc.producto.ProductoReactiveRepository;
 
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 
@@ -21,13 +26,22 @@ public class FranquiciaReactiveRepositoryAdapter extends ReactiveAdapterOperatio
     Integer,
         FranquiciaReactiveRepository
 > implements FranquiciaRepository {
-    public FranquiciaReactiveRepositoryAdapter(FranquiciaReactiveRepository repository, ObjectMapper mapper) {
+
+    private final SucursalReactiveRepository sucursalRepository;
+    private final ProductoReactiveRepository productoRepository;
+
+    public FranquiciaReactiveRepositoryAdapter(FranquiciaReactiveRepository repository,
+                                             ObjectMapper mapper,
+                                             SucursalReactiveRepository sucursalRepository,
+                                             ProductoReactiveRepository productoRepository) {
         /**
          *  Could be use mapper.mapBuilder if your domain model implement builder pattern
          *  super(repository, mapper, d -> mapper.mapBuilder(d,ObjectModel.ObjectModelBuilder.class).build());
          *  Or using mapper.map with the class of the object model
          */
         super(repository, mapper, d -> mapper.mapBuilder(d,Franquicia.FranquiciaBuilder.class).build());
+        this.sucursalRepository = sucursalRepository;
+        this.productoRepository = productoRepository;
     }
 
     @Override
@@ -67,24 +81,31 @@ public class FranquiciaReactiveRepositoryAdapter extends ReactiveAdapterOperatio
     @Override
     public Flux<Franquicia> findProductoWithMaxStockBySucursal(Integer idFranquicia) {
         return repository.findById(idFranquicia)
-            .map(entity -> {
-                if (entity.getListaSucursales() != null) {
-                    entity.getListaSucursales().forEach(sucursal -> {
-                        if (sucursal.getListaProductos() != null && !sucursal.getListaProductos().isEmpty()) {
-                            Producto maxStockProducto = sucursal.getListaProductos().stream()
-                                    .max(Comparator.comparingInt(Producto::getStock))
-                                .orElse(null);
-                            List<Producto> productosMax = maxStockProducto != null
-                                ? List.of(mapper.map(maxStockProducto, Producto.class))
-                                : List.of();
-                            sucursal.setListaProductos(productosMax);
-                        } else {
-                            sucursal.setListaProductos(List.of());
-                        }
-                    });
-                }
-                return mapper.map(entity, Franquicia.class);
-            })
-            .flux();
+                .flatMapMany(franquiciaEntity ->
+                        sucursalRepository.findByIdFranquicia(idFranquicia)
+                                .flatMap(sucursalEntity ->
+                                        productoRepository.findByIdSucursal(sucursalEntity.getIdSucursal())
+                                                .collectList()
+                                                .map(productos -> {
+                                                    ProductoEntity maxProducto = productos.stream()
+                                                            .max(Comparator.comparingInt(ProductoEntity::getStock))
+                                                            .orElse(null);
+                                                    
+                                                    List<Producto> productoList = new ArrayList<>();
+                                                    if (maxProducto != null) {
+                                                        productoList.add(mapper.map(maxProducto, Producto.class));
+                                                    }
+                                                    Sucursal sucursal = mapper.map(sucursalEntity, Sucursal.class);
+                                                    sucursal.setListaProductos(productoList);
+                                                    return sucursal;
+                                                })
+                                )
+                                .collectList()
+                                .map(sucursales -> {
+                                    Franquicia franquicia = mapper.map(franquiciaEntity, Franquicia.class);
+                                    franquicia.setListaSucursales(sucursales);
+                                    return franquicia;
+                                })
+                );
     }
 }
