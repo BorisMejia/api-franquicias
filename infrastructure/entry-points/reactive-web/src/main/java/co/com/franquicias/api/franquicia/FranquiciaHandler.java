@@ -1,9 +1,10 @@
 package co.com.franquicias.api.franquicia;
 
 import co.com.franquicias.api.franquicia.dto.mapper.FranquiciaMapper;
+import co.com.franquicias.api.franquicia.dto.request.FranquiciaRequestDto;
 import co.com.franquicias.api.franquicia.dto.request.RegisterFranquiciaDto;
 import co.com.franquicias.api.franquicia.dto.request.UpdateNombreFranquiciaRequestDto;
-import co.com.franquicias.usecase.franquicia.FranquiciaUseCase;
+import co.com.franquicias.usecase.franquicia.IFranquiciaUseCase;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.server.ServerRequest;
@@ -14,7 +15,7 @@ import reactor.core.publisher.Mono;
 @RequiredArgsConstructor
 public class FranquiciaHandler {
 
-    private final FranquiciaUseCase franquiciaUseCase;
+    private final IFranquiciaUseCase franquiciaUseCase;
     private final FranquiciaMapper franquiciaMapper;
 
     public Mono<ServerResponse> registerFranquicia(ServerRequest request){
@@ -34,6 +35,16 @@ public class FranquiciaHandler {
                 ))
                 .map(franquiciaMapper::toResponse)
                 .flatMap(responseUpdate -> ServerResponse.ok().bodyValue(responseUpdate));
+    }
+    public Mono<ServerResponse> getProductoMaxStockForSucursal(ServerRequest request){
+        return request.bodyToMono(FranquiciaRequestDto.class)
+                .flatMapMany(franquicia -> 
+                    franquiciaUseCase.findProductoWithMaxStockBySucursal(franquicia.idFranquicia())
+                )
+                .next()
+                .map(franquiciaMapper::toResponseProductoMax)
+                .flatMap(responseGet -> ServerResponse.ok().bodyValue(responseGet))
+                .switchIfEmpty(ServerResponse.notFound().build());
     }
 
 }

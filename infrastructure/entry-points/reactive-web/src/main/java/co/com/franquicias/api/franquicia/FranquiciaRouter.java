@@ -1,8 +1,10 @@
 package co.com.franquicias.api.franquicia;
 
+import co.com.franquicias.api.franquicia.dto.request.FranquiciaRequestDto;
 import co.com.franquicias.api.franquicia.dto.request.RegisterFranquiciaDto;
 import co.com.franquicias.api.franquicia.dto.request.UpdateNombreFranquiciaRequestDto;
 import co.com.franquicias.api.franquicia.dto.response.FranquiciaResponseDto;
+import co.com.franquicias.api.franquicia.dto.response.ProductoMaxStockResponseDto;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -98,11 +100,50 @@ public class FranquiciaRouter {
                                     )
                             }
                     )
+            ),
+            @RouterOperation(
+                    path = "/franquicia/get-producto-max-stock",
+                    method = RequestMethod.POST,
+                    beanClass = FranquiciaHandler.class,
+                    beanMethod = "getProductoMaxStockForSucursal",
+                    operation = @Operation(
+                            operationId = "getProductoMaxStockForSucursal",
+                            summary = "Obtener el producto con mayor stock por sucursal en una franquicia",
+                            description = "Endpoint para Obtener el producto con mayor stock por sucursal en una franquicia ",
+                            tags = {"Franquicias"},
+                            requestBody = @RequestBody(
+                                    description = "Datos de la franquici",
+                                    required = true,
+                                    content = @Content(
+                                            mediaType = "application/json",
+                                            schema = @Schema(implementation = FranquiciaRequestDto.class)
+                                    )
+                            ),
+                            responses = {
+                                    @ApiResponse(
+                                            responseCode = "200",
+                                            description = "Franquicia actualizada correctamente",
+                                            content = @Content(
+                                                    mediaType = "application/json",
+                                                    schema = @Schema(implementation = ProductoMaxStockResponseDto.class)
+                                            )
+                                    ),
+                                    @ApiResponse(
+                                            responseCode = "400",
+                                            description = "Datos de entrada inválidos"
+                                    ),
+                                    @ApiResponse(
+                                            responseCode = "500",
+                                            description = "Error interno del servidor"
+                                    )
+                            }
+                    )
             )
     })
     public RouterFunction<ServerResponse> routeFranquicia (FranquiciaHandler franquiciaHandler){
         return route(POST("/franquicia/register"), franquiciaHandler::registerFranquicia)
                 .andRoute(PATCH("/franquicia/update"), franquiciaHandler::updateFranquicia)
+                .andRoute(POST("/franquicia/get-producto-max-stock"), franquiciaHandler::getProductoMaxStockForSucursal)
 
                 ;
     }
