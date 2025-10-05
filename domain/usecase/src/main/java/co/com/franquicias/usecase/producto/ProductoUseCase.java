@@ -19,7 +19,13 @@ public class ProductoUseCase implements IProductoUseCase {
                 .switchIfEmpty(Mono.error(new IllegalArgumentException("No existe una franquicia con el id: " + idFranquicia)))
                 .flatMap(sucursal -> sucursalRepository.findByIdSucursal(idSucursal))
                 .switchIfEmpty(Mono.error(new IllegalArgumentException("No existe una sucursal con el id: " + idSucursal)))
-                .flatMap(producto -> productoRepository.saveProducto(idSucursal, idProducto, nombreProducto, stock))
+                .flatMap(producto -> {
+                    if (nombreProducto == null || nombreProducto.trim().isEmpty())
+                        return Mono.error(new IllegalArgumentException("El nombre del producto no permitido"));
+                    if (stock < 0)
+                        return Mono.error(new IllegalArgumentException("El valor del stock no permitido"));
+                    return productoRepository.saveProducto(idSucursal, idProducto, nombreProducto, stock);
+                })
                 ;
     }
 
@@ -27,26 +33,19 @@ public class ProductoUseCase implements IProductoUseCase {
     public Mono<Void> deleteProducto(Integer idFranquicia, Integer idSucursal, Integer idProducto) {
         return franquiciaRepository.findByIdFranquicia(idFranquicia)
                 .switchIfEmpty(Mono.error(new IllegalArgumentException("No existe una franquicia con el id: " + idFranquicia)))
-                .flatMap(franquicia -> {
-                    boolean sucursalExists = franquicia.getListaSucursales().stream()
-                            .anyMatch(sucursal -> sucursal.getIdSucursal().equals(idSucursal));
-                    
-                    if (!sucursalExists)
-                        return Mono.error(new IllegalArgumentException("No existe una sucursal con el id: " + idSucursal + " en la franquicia: " + idFranquicia));
-                    return productoRepository.deleteProducto(idProducto);
-                });
+                .flatMap(sucursal -> sucursalRepository.findByIdSucursal(idSucursal))
+                .switchIfEmpty(Mono.error(new IllegalArgumentException("No existe una sucursal con el id: " + idSucursal)))
+                .flatMap(producto -> productoRepository.deleteProducto(idProducto))
+                ;
     }
 
     @Override
     public Mono<Producto> updateStock(Integer idFranquicia, Integer idSucursal, Integer idProducto, Integer nuevoStock) {
         return franquiciaRepository.findByIdFranquicia(idFranquicia)
                 .switchIfEmpty(Mono.error(new IllegalArgumentException("No existe una franquicia con el id: " + idFranquicia)))
-                .flatMap(franquicia -> {
-                    boolean sucursalExists = franquicia.getListaSucursales().stream()
-                            .anyMatch(sucursal -> sucursal.getIdSucursal().equals(idSucursal));
-
-                    if (!sucursalExists)
-                        return Mono.error(new IllegalArgumentException("No existe una sucursal con el id: " + idSucursal + " en la franquicia: " + idFranquicia));
+                .flatMap(sucursal -> sucursalRepository.findByIdSucursal(idSucursal))
+                .switchIfEmpty(Mono.error(new IllegalArgumentException("No existe una sucursal con el id: " + idSucursal)))
+                .flatMap(producto -> {
                     if (nuevoStock == null || nuevoStock < 0)
                         return Mono.error(new IllegalArgumentException("El stock no puede ser negativo"));
                     return productoRepository.updateStockProducto(idProducto, nuevoStock);
@@ -57,15 +56,17 @@ public class ProductoUseCase implements IProductoUseCase {
     public Mono<Producto> updateNombreProducto(Integer idFranquicia, Integer idSucursal, Integer idProducto, String nuevoNombreProducto) {
         return franquiciaRepository.findByIdFranquicia(idFranquicia)
                 .switchIfEmpty(Mono.error(new IllegalArgumentException("No existe una franquicia con el id: " + idFranquicia)))
-                .flatMap(franquicia -> {
-                    boolean sucursalExists = franquicia.getListaSucursales().stream()
-                            .anyMatch(sucursal -> sucursal.getIdSucursal().equals(idSucursal));
-
-                    if (!sucursalExists)
-                        return Mono.error(new IllegalArgumentException("No existe una sucursal con el id: " + idSucursal + " en la franquicia: " + idFranquicia));
-                    if (nuevoNombreProducto == null || nuevoNombreProducto.trim().isEmpty())
+                .flatMap(sucursal -> sucursalRepository.findByIdSucursal(idSucursal))
+                .switchIfEmpty(Mono.error(new IllegalArgumentException("No existe una sucursal con el id: " + idSucursal)))
+                .flatMap(producto -> {
+                    if (nuevoNombreProducto == null || nuevoNombreProducto.trim().isEmpty()) {
                         return Mono.error(new IllegalArgumentException("El nombre del producto no puede estar vacío"));
-                    return productoRepository.updateNombreProducto(idProducto, nuevoNombreProducto);
-                });
+                    }
+                    if (nuevoNombreProducto.trim().length() > 30) {
+                        return Mono.error(new IllegalArgumentException("El nombre del producto no puede exceder 30 caracteres"));
+                    }
+                    return productoRepository.updateNombreProducto(idProducto, nuevoNombreProducto.trim());
+                })
+                .switchIfEmpty(Mono.error(new IllegalArgumentException("No se encontró un producto con el id: " + idProducto)));
     }
 }
