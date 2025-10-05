@@ -1,7 +1,9 @@
 package co.com.franquicias.api.sucursal;
 
 import co.com.franquicias.api.sucursal.dto.request.RegisterSucursalRequestDto;
+import co.com.franquicias.api.sucursal.dto.request.UpdateNombreSucursalRequestDto;
 import co.com.franquicias.api.sucursal.dto.response.SucursalResponseDto;
+import co.com.franquicias.api.sucursal.dto.response.UpdateNombreSucursalResponseDto;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -60,11 +62,50 @@ public class SucursalRouter {
                                     )
                             }
                     )
+            ),
+            @RouterOperation(
+                    path = "/franquicia/sucursal/update-nombre-sucursal",
+                    method = RequestMethod.PATCH,
+                    beanClass = SucursalHandler.class,
+                    beanMethod = "updateNombreSucursal",
+                    operation = @Operation(
+                            operationId = "updateNombreSucursal",
+                            summary = "Actualizar el nombre de una sucursal",
+                            description = "Endpoint para actualizar el nombre de una sucursal por id",
+                            tags = {"Sucursales"},
+                            requestBody = @RequestBody(
+                                    description = "Datos de la sucursal a actualizar",
+                                    required = true,
+                                    content = @Content(
+                                            mediaType = "application/json",
+                                            schema = @Schema(implementation = UpdateNombreSucursalRequestDto.class)
+                                    )
+                            ),
+                            responses = {
+                                    @ApiResponse(
+                                            responseCode = "200",
+                                            description = "Nombre de la sucursal actualizado correctamente",
+                                            content = @Content(
+                                                    mediaType = "application/json",
+                                                    schema = @Schema(implementation = UpdateNombreSucursalResponseDto.class)
+                                            )
+                                    ),
+                                    @ApiResponse(
+                                            responseCode = "400",
+                                            description = "Datos de entrada inválidos"
+                                    ),
+                                    @ApiResponse(
+                                            responseCode = "500",
+                                            description = "Error interno del servidor"
+                                    )
+                            }
+                    )
             )
 
     })
     public RouterFunction<ServerResponse> routerSucursal(SucursalHandler sucursalHandler){
         return route(POST("/franquicia/sucursal/create"), sucursalHandler::createSucursal)
+                .andRoute(PATCH("/franquicia/sucursal/update-nombre-sucursal"), sucursalHandler::updateNombreSucursal)
 
                 ;
     }
