@@ -1,7 +1,9 @@
 package co.com.franquicias.api.producto;
 
+import co.com.franquicias.api.producto.dto.request.DeleteProductoRequestDto;
 import co.com.franquicias.api.producto.dto.request.RegisterProductoRequestDto;
 import co.com.franquicias.api.producto.dto.request.UpdateStockProductoRequestDto;
+import co.com.franquicias.api.producto.dto.response.DeleteProductoResponseDto;
 import co.com.franquicias.api.producto.dto.response.RegisterProductoResponseDto;
 import co.com.franquicias.api.producto.dto.response.UpdateStockProductoResponseDto;
 import io.swagger.v3.oas.annotations.Operation;
@@ -100,13 +102,51 @@ public class ProductoRouter {
                                     )
                             }
                     )
+            ),
+            @RouterOperation(
+                    path = "/franquicia/sucursal/producto/delete",
+                    method = RequestMethod.DELETE,
+                    beanClass = ProductoHandler.class,
+                    beanMethod = "deleteProducto",
+                    operation = @Operation(
+                            operationId = "deleteProducto",
+                            summary = "Eliminar un producto",
+                            description = "Endpoint para eliminar un producto por id",
+                            tags = {"Productos"},
+                            requestBody = @RequestBody(
+                                    description = "Datos del producto a eliminar",
+                                    required = true,
+                                    content = @Content(
+                                            mediaType = "application/json",
+                                            schema = @Schema(implementation = DeleteProductoRequestDto.class)
+                                    )
+                            ),
+                            responses = {
+                                    @ApiResponse(
+                                            responseCode = "200",
+                                            description = "Producto eliminado correctamente",
+                                            content = @Content(
+                                                    mediaType = "application/json",
+                                                    schema = @Schema(implementation = DeleteProductoResponseDto.class)
+                                            )
+                                    ),
+                                    @ApiResponse(
+                                            responseCode = "400",
+                                            description = "Datos de entrada inválidos"
+                                    ),
+                                    @ApiResponse(
+                                            responseCode = "500",
+                                            description = "Error interno del servidor"
+                                    )
+                            }
+                    )
             )
 
     })
     public RouterFunction<ServerResponse> routerProducto(ProductoHandler productoHandler){
         return route(POST("/franquicia/sucursal/producto/create"), productoHandler::createProducto)
                 .andRoute(PATCH("/franquicia/sucursal/producto/update"), productoHandler::updateStock)
-
+                .andRoute(DELETE("/franquicia/sucursal/producto/delete"), productoHandler::deleteProducto)
                 ;
     }
 
