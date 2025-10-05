@@ -3,6 +3,7 @@ package co.com.franquicias.api.producto;
 import co.com.franquicias.api.producto.dto.mapper.ProductoMapper;
 import co.com.franquicias.api.producto.dto.request.DeleteProductoRequestDto;
 import co.com.franquicias.api.producto.dto.request.RegisterProductoRequestDto;
+import co.com.franquicias.api.producto.dto.request.UpdateNombreProductoRequestDto;
 import co.com.franquicias.api.producto.dto.request.UpdateStockProductoRequestDto;
 import co.com.franquicias.api.producto.dto.response.DeleteProductoResponseDto;
 import co.com.franquicias.usecase.producto.IProductoUseCase;
@@ -52,6 +53,18 @@ public class ProductoHandler {
                 ))
                 .then(Mono.just(new DeleteProductoResponseDto("Producto eliminado correctamente")))
                 .flatMap(response -> ServerResponse.ok().bodyValue(response));
+    }
+
+    Mono<ServerResponse> updateNombreProducto(ServerRequest request){
+        return request.bodyToMono(UpdateNombreProductoRequestDto.class)
+                .flatMap(updateNombreProducto -> productoUseCase.updateNombreProducto(
+                        updateNombreProducto.idFranquicia(),
+                        updateNombreProducto.idSucursal(),
+                        updateNombreProducto.idProducto(),
+                        updateNombreProducto.nuevoNombreProducto()
+                ))
+                .map(productoMapper::toResponseUpdateNombre)
+                .flatMap(responseUpdateNombre -> ServerResponse.ok().bodyValue(responseUpdateNombre));
     }
 
 }

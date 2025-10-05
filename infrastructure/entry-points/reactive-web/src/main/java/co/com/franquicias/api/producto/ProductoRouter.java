@@ -2,9 +2,11 @@ package co.com.franquicias.api.producto;
 
 import co.com.franquicias.api.producto.dto.request.DeleteProductoRequestDto;
 import co.com.franquicias.api.producto.dto.request.RegisterProductoRequestDto;
+import co.com.franquicias.api.producto.dto.request.UpdateNombreProductoRequestDto;
 import co.com.franquicias.api.producto.dto.request.UpdateStockProductoRequestDto;
 import co.com.franquicias.api.producto.dto.response.DeleteProductoResponseDto;
 import co.com.franquicias.api.producto.dto.response.RegisterProductoResponseDto;
+import co.com.franquicias.api.producto.dto.response.UpdateNombreProductoResponseDto;
 import co.com.franquicias.api.producto.dto.response.UpdateStockProductoResponseDto;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -140,6 +142,44 @@ public class ProductoRouter {
                                     )
                             }
                     )
+            ),
+            @RouterOperation(
+                    path = "/franquicia/sucursal/producto/update-nombre-producto",
+                    method = RequestMethod.PATCH,
+                    beanClass = ProductoHandler.class,
+                    beanMethod = "updateNombreProducto",
+                    operation = @Operation(
+                            operationId = "updateNombreProducto",
+                            summary = "Actualizar el nombre de un producto",
+                            description = "Endpoint para actualizar el nombre de un producto por id",
+                            tags = {"Productos"},
+                            requestBody = @RequestBody(
+                                    description = "Datos del producto a actualizar",
+                                    required = true,
+                                    content = @Content(
+                                            mediaType = "application/json",
+                                            schema = @Schema(implementation = UpdateNombreProductoRequestDto.class)
+                                    )
+                            ),
+                            responses = {
+                                    @ApiResponse(
+                                            responseCode = "200",
+                                            description = "Nombre del producto actualizado correctamente",
+                                            content = @Content(
+                                                    mediaType = "application/json",
+                                                    schema = @Schema(implementation = UpdateNombreProductoResponseDto.class)
+                                            )
+                                    ),
+                                    @ApiResponse(
+                                            responseCode = "400",
+                                            description = "Datos de entrada inválidos"
+                                    ),
+                                    @ApiResponse(
+                                            responseCode = "500",
+                                            description = "Error interno del servidor"
+                                    )
+                            }
+                    )
             )
 
     })
@@ -147,6 +187,7 @@ public class ProductoRouter {
         return route(POST("/franquicia/sucursal/producto/create"), productoHandler::createProducto)
                 .andRoute(PATCH("/franquicia/sucursal/producto/update"), productoHandler::updateStock)
                 .andRoute(DELETE("/franquicia/sucursal/producto/delete"), productoHandler::deleteProducto)
+                .andRoute(PATCH("/franquicia/sucursal/producto/update-nombre-producto"), productoHandler::updateNombreProducto)
                 ;
     }
 
