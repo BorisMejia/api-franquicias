@@ -27,14 +27,10 @@ public class ProductoUseCase implements IProductoUseCase {
     public Mono<Void> deleteProducto(Integer idFranquicia, Integer idSucursal, Integer idProducto) {
         return franquiciaRepository.findByIdFranquicia(idFranquicia)
                 .switchIfEmpty(Mono.error(new IllegalArgumentException("No existe una franquicia con el id: " + idFranquicia)))
-                .flatMap(franquicia -> {
-                    boolean sucursalExists = franquicia.getListaSucursales().stream()
-                            .anyMatch(sucursal -> sucursal.getIdSucursal().equals(idSucursal));
-                    
-                    if (!sucursalExists)
-                        return Mono.error(new IllegalArgumentException("No existe una sucursal con el id: " + idSucursal + " en la franquicia: " + idFranquicia));
-                    return productoRepository.deleteProducto(idProducto);
-                });
+                .flatMap(sucursal -> sucursalRepository.findByIdSucursal(idSucursal))
+                .switchIfEmpty(Mono.error(new IllegalArgumentException("No existe una sucursal con el id: " + idSucursal)))
+                .flatMap(producto -> productoRepository.deleteProducto(idProducto))
+                ;
     }
 
     @Override
