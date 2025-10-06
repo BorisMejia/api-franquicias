@@ -13,11 +13,11 @@ spring:
     include: null
 adapters:
   r2dbc:
-    host: ${AWS_HOST_DB:localhost}
-    port: "5432"
-    database: ${AWS_DATABASE_NAME:franquicia_db}
-    username: ${AWS_USERNAME_DB:franquicia_user}
-    password: ${AWS_PASSWORD_DB:franquicia_pass}
+    host: ${HOST_DB:postgres}
+    port: ${PORT_DB:5432}
+    database: ${DATABASE_NAME:franquicia_db}
+    username: ${USERNAME_DB:franquicia_user}
+    password: ${PASSWORD_DB:franquicia_pass}
   data:
     r2dbc:
       repositories: null

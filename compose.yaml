@@ -8,7 +8,7 @@ services:
       POSTGRES_USER: franquicia_user
       POSTGRES_PASSWORD: franquicia_pass
     ports:
-      - "5432:5432"
+      - "127.0.0.1:5435:5432"
     volumes:
       - pgdata:/var/lib/postgresql/data
       - ./init.sql:/docker-entrypoint-initdb.d/init.sql
@@ -25,10 +25,9 @@ services:
     depends_on:
       - postgres
     environment:
-      SPRING_R2DBC_HOST: ${AWS_HOST_DB}
-      SPRING_R2DBC_DB: ${AWS_DATABASE_NAME}
-      SPRING_R2DBC_USERNAME: ${AWS_USERNAME_DB}
-      SPRING_R2DBC_PASSWORD: ${AWS_PASSWORD_DB}
+      SPRING_R2DBC_URL: ${DATABASE_URL:-r2dbc:postgresql://postgres:5435/franquicia_db}
+      SPRING_R2DBC_USERNAME: ${USERNAME_DB:-franquicia_user}
+      SPRING_R2DBC_PASSWORD: ${PASSWORD_DB:-franquicia_pass}
 
     ports:
       - "8080:8080"
