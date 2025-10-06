@@ -11,7 +11,27 @@ services:
       - "5432:5432"
     volumes:
       - pgdata:/var/lib/postgresql/data
-#      - ./init-db.sql:/docker-entrypoint-initdb.d/init-db.sql
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+    networks:
+      - franquicia-network
+
+  api-franquicia:
+    build:
+      context: .
+      dockerfile: deployment/Dockerfile
+    container_name: api-franquicia
+    env_file:
+      - .env
+    depends_on:
+      - postgres
+    environment:
+      SPRING_R2DBC_HOST: ${AWS_HOST_DB}
+      SPRING_R2DBC_DB: ${AWS_DATABASE_NAME}
+      SPRING_R2DBC_USERNAME: ${AWS_USERNAME_DB}
+      SPRING_R2DBC_PASSWORD: ${AWS_PASSWORD_DB}
+
+    ports:
+      - "8080:8080"
     networks:
       - franquicia-network
 
