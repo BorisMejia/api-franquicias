@@ -68,7 +68,7 @@ public class ProductoRouter {
                     )
             ),
             @RouterOperation(
-                    path = "/franquicia/sucursal/producto/update",
+                    path = "/franquicia/sucursal/producto/update-stock",
                     method = RequestMethod.PATCH,
                     beanClass = ProductoHandler.class,
                     beanMethod = "updateStock",
@@ -185,7 +185,7 @@ public class ProductoRouter {
     })
     public RouterFunction<ServerResponse> routerProducto(ProductoHandler productoHandler){
         return route(POST("/franquicia/sucursal/producto/create"), productoHandler::createProducto)
-                .andRoute(PATCH("/franquicia/sucursal/producto/update"), productoHandler::updateStock)
+                .andRoute(PATCH("/franquicia/sucursal/producto/update-stock"), productoHandler::updateStock)
                 .andRoute(DELETE("/franquicia/sucursal/producto/delete"), productoHandler::deleteProducto)
                 .andRoute(PATCH("/franquicia/sucursal/producto/update-nombre-producto"), productoHandler::updateNombreProducto)
                 ;
