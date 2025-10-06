@@ -1,0 +1,42 @@
+version: '3.8'
+services:
+  postgres:
+    image: postgres:15
+    container_name: franquicia-db
+    environment:
+      POSTGRES_DB: franquicia_db
+      POSTGRES_USER: franquicia_user
+      POSTGRES_PASSWORD: franquicia_pass
+    ports:
+      - "127.0.0.1:5435:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+    networks:
+      - franquicia-network
+
+  api-franquicia:
+    build:
+      context: .
+      dockerfile: deployment/Dockerfile
+    container_name: api-franquicia
+    env_file:
+      - .env
+    depends_on:
+      - postgres
+    environment:
+      SPRING_R2DBC_URL: ${DATABASE_URL:-r2dbc:postgresql://postgres:5435/franquicia_db}
+      SPRING_R2DBC_USERNAME: ${USERNAME_DB:-franquicia_user}
+      SPRING_R2DBC_PASSWORD: ${PASSWORD_DB:-franquicia_pass}
+
+    ports:
+      - "8080:8080"
+    networks:
+      - franquicia-network
+
+volumes:
+  pgdata:
+
+networks:
+  franquicia-network:
+    driver: bridge
